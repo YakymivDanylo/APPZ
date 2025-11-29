@@ -23,7 +23,7 @@ class OrderBuilder:
     def build(self):
         self.order.save()
         for item in self.items:
-            OrderItem.objects.create(order=self.order, product=item.product, qty=item.qty)
+            OrderItem.objects.create(order=self.order, product=item.product, qty=item.quantity)
         return self.order
 
 

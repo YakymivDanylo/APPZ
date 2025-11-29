@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Product, CartItem
+from .models import Product, CartItem, Order
 from .serializers import ProductSerializer
 # Імпорт патернів
 from .patterns.factory import UserFactory
@@ -81,3 +81,20 @@ class DiscountView(APIView):
 
         final_price = strategy.calculate(total)
         return Response({"final_price": final_price, "strategy": strategy.__class__.__name__})
+
+
+# 6. Зміна статусу замовлення (Observer Trigger)
+class OrderStatusUpdateView(APIView):
+    def post(self, request, pk):
+        try:
+            order = Order.objects.get(pk=pk)
+            new_status = request.data.get('status')
+
+            if new_status in dict(Order.STATUS_CHOICES):
+                order.status = new_status
+                order.save()  # <-- Саме тут спрацює Signal (Observer) з api/signals.py
+                return Response({"message": f"Status updated to {new_status}"})
+            else:
+                return Response({"error": "Invalid status"}, status=400)
+        except Order.DoesNotExist:
+            return Response({"error": "Order not found"}, status=404)
