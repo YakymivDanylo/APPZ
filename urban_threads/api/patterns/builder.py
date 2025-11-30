@@ -8,7 +8,6 @@ class OrderBuilder:
         self.order = Order(user=user, status='draft')
 
     def add_items_from_cart(self, cart_items):
-        # Логіка перенесення товарів з кошика в замовлення
         self.items = cart_items
         return self
 
@@ -27,7 +26,6 @@ class OrderBuilder:
         return self.order
 
 
-# views.py
 class CheckoutView(APIView):
     def post(self, request):
         builder = OrderBuilder(request.user)
